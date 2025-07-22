@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { FilterOptions } from "./types";
 import { getBookingStatus } from "@/lib/utils";
-import Filters from "@/components/dashboard/filter";
+import Filters from "@/components/dashboard/filters";
 import Container from "@/components/layout/Container";
 
 // Custom Hooks
