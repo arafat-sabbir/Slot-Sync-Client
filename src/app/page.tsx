@@ -100,12 +100,12 @@ const BookingsGrid: React.FC<{
 
   if (Object.keys(groupedBookings).length === 0) {
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+      <div className="bg-white rounded-xl custom-shadow-sm border border-gray-100 p-12 text-center">
         <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <h3 className="text-lg font-medium text-c-heading mb-2">
           No bookings found
         </h3>
-        <p className="text-gray-500">
+        <p className="text-c-body2">
           Try adjusting your filters or create a new booking.
         </p>
       </div>
@@ -117,11 +117,11 @@ const BookingsGrid: React.FC<{
       {Object.entries(groupedBookings).map(([resource, resourceBookings]) => (
         <div
           key={resource}
-          className="bg-white rounded-xl shadow-sm border border-gray-100 p-6"
+          className="bg-white rounded-xl custom-shadow-sm border border-gray-100 p-6"
         >
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">{resource}</h2>
-            <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+            <h2 className="text-xl font-semibold text-c-heading">{resource}</h2>
+            <span className="text-sm text-c-body2 bg-gray-100 px-2 py-1 rounded-full">
               {resourceBookings.length} booking
               {resourceBookings.length !== 1 ? "s" : ""}
             </span>
@@ -146,7 +146,7 @@ const ErrorState: React.FC<{ error: string; onRetry: () => void }> = ({
   error,
   onRetry,
 }) => (
-  <div className="bg-white rounded-xl shadow-sm border border-red-200 p-6">
+  <div className="bg-white rounded-xl custom-shadow-sm border border-red-200 p-6">
     <div className="flex items-center gap-3 text-red-700 mb-4">
       <AlertCircle className="h-5 w-5" />
       <h3 className="font-medium">Error loading bookings</h3>
@@ -162,10 +162,10 @@ const ErrorState: React.FC<{ error: string; onRetry: () => void }> = ({
 );
 
 const LoadingState: React.FC = () => (
-  <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12">
+  <div className="bg-white rounded-xl custom-shadow-sm border border-gray-100 p-12">
     <div className="flex flex-col items-center">
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
-      <p className="text-gray-500">Loading bookings...</p>
+      <p className="text-c-body2">Loading bookings...</p>
     </div>
   </div>
 );
@@ -214,15 +214,15 @@ const BookingDashboard: React.FC = () => {
   }, [bookings, filters]);
 
   return (
-    <Container className="min-h-screen bg-gray-50">
+    <Container className="min-h-screen ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-3xl font-bold text-c-heading">
               Booking Dashboard
             </h1>
-            <p className="mt-1 text-gray-500">
+            <p className="mt-1 text-c-body2">
               Manage and track all your resource bookings
             </p>
           </div>

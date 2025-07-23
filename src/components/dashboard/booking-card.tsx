@@ -20,7 +20,7 @@ const BookingCard: React.FC<{
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
+    <div className="bg-white rounded-lg border border-c-stroke-gray p-4 hover:shadow-md transition-shadow">
       <div className="flex justify-between items-start mb-3">
         <div>
           <h3 className="font-medium text-gray-900">{booking.resource}</h3>

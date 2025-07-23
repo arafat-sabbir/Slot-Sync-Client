@@ -21,8 +21,8 @@ export const getStatusColor = (status: BookingStatus): string => {
     case "ongoing":
       return "bg-green-50 text-green-700 border-green-200";
     case "past":
-      return "bg-gray-50 text-gray-600 border-gray-200";
+      return "bg-gray-50 text-gray-600 border-c-stroke-gray";
     default:
-      return "bg-gray-50 text-gray-600 border-gray-200";
+      return "bg-gray-50 text-gray-600 border-c-stroke-gray";
   }
 };

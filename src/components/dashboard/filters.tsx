@@ -1,6 +1,15 @@
 import React, { useState } from "react";
-import { Calendar, Filter, X, ChevronDown, MapPin } from "lucide-react";
+import { Calendar, X, MapPin } from "lucide-react";
 import { format } from "date-fns";
+import { useForm } from "react-hook-form";
+import { Form } from "../ui/form";
+import { SelectItem } from "../ui/select";
+import CustomFormField, { FormFieldType } from "../shared/CustomFormField";
+import {
+  getInputClassNames,
+  getLabelClassNames,
+  getSelectTriggerClassName,
+} from "@/styles";
 
 const Filters = () => {
   const [filters, setFilters] = useState({
@@ -23,24 +32,6 @@ const Filters = () => {
     filters.date !== undefined ||
     filters.status !== "all";
 
-  const clearAllFilters = () => {
-    setFilters({
-      resource: "all",
-      date: undefined,
-      status: "all",
-    });
-  };
-
-  const activeFilterCount = [
-    filters.resource !== "all",
-    filters.date !== undefined,
-    filters.status !== "all",
-  ].filter(Boolean).length;
-
-  const [showCalendar, setShowCalendar] = useState(false);
-  const [showResourceDropdown, setShowResourceDropdown] = useState(false);
-  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
-
   const statusOptions = [
     { value: "all", label: "All Status", color: "gray" },
     { value: "upcoming", label: "Upcoming", color: "blue" },
@@ -48,149 +39,76 @@ const Filters = () => {
     { value: "past", label: "Past", color: "gray" },
   ];
 
+  const form = useForm();
+  const watchedValues = form.watch(); // This watches all form values
+  React.useEffect(() => {
+    setFilters((prev) => ({
+      ...prev,
+      resource: watchedValues.resource || "all",
+      date: watchedValues.date,
+      status: watchedValues.status || "all",
+    }));
+  }, [watchedValues.resource, watchedValues.date, watchedValues.status]);
+  
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md border border-gray-200">
+    <div className="p-6  rounded-xl custom-shadow-sm border border-c-stroke-gray">
       {/* Main Filter Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Resource Filter */}
-        <div className="relative">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Resource
-          </label>
-          <button
-            onClick={() => setShowResourceDropdown(!showResourceDropdown)}
-            className="w-full bg-white border border-gray-300 rounded-md px-4 py-2.5 text-left flex items-center justify-between hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+      <Form {...form}>
+        <form className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Resource Filter */}
+          <CustomFormField
+            control={form.control}
+            name="resource"
+            selectTriggerClassName={getSelectTriggerClassName()}
+            labelClassname={getLabelClassNames()}
+            className={getInputClassNames()}
+            fieldType={FormFieldType.SELECT}
+            label="Resource"
+            placeholder="Select Resource"
           >
-            <div className="flex items-center gap-2.5">
-              <MapPin className="h-4 w-4 text-gray-500" />
-              <span
-                className={
-                  filters.resource === "all" ? "text-gray-500" : "text-gray-900"
-                }
-              >
-                {filters.resource === "all"
-                  ? "All Resources"
-                  : filters.resource}
-              </span>
-            </div>
-            <ChevronDown className="h-4 w-4 text-gray-400" />
-          </button>
-          {showResourceDropdown && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10">
-              <div className="p-1.5">
-                <button
-                  onClick={() => {
-                    setFilters({ ...filters, resource: "all" });
-                    setShowResourceDropdown(false);
-                  }}
-                  className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-md text-sm text-gray-700"
-                >
-                  All Resources
-                </button>
-                {resources.map((resource) => (
-                  <button
-                    key={resource}
-                    onClick={() => {
-                      setFilters({ ...filters, resource });
-                      setShowResourceDropdown(false);
-                    }}
-                    className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-md text-sm text-gray-700"
-                  >
-                    {resource}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Date Filter */}
-        <div className="relative">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Date
-          </label>
-          <button
-            onClick={() => setShowCalendar(!showCalendar)}
-            className="w-full bg-white border border-gray-300 rounded-md px-4 py-2.5 text-left flex items-center gap-2.5 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+            <SelectItem value="all">All Resources</SelectItem>
+            {resources.map((r) => (
+              <SelectItem key={r} value={r}>
+                {r}
+              </SelectItem>
+            ))}
+          </CustomFormField>
+          {/* Date Filter */}
+          <CustomFormField
+            control={form.control}
+            labelClassname={getLabelClassNames()}
+            className={getInputClassNames()}
+            name="date"
+            fieldType={FormFieldType.CALENDAR}
+            label="Date"
+            placeholder="Select Date"
+          />
+          {/* Status Filter */}
+          <CustomFormField
+            control={form.control}
+            name="status"
+            selectTriggerClassName={getSelectTriggerClassName()}
+            labelClassname={getLabelClassNames()}
+            className={getInputClassNames()}
+            fieldType={FormFieldType.SELECT}
+            placeholder="Select Status"
+            label="Status"
           >
-            <Calendar className="h-4 w-4 text-gray-500" />
-            <span className={!filters.date ? "text-gray-500" : "text-gray-900"}>
-              {filters.date
-                ? format(filters.date, "MMM dd, yyyy")
-                : "Select date"}
-            </span>
-          </button>
-        </div>
-
-        {/* Status Filter */}
-        <div className="relative">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Status
-          </label>
-          <button
-            onClick={() => setShowStatusDropdown(!showStatusDropdown)}
-            className="w-full bg-white border border-gray-300 rounded-md px-4 py-2.5 text-left flex items-center justify-between hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-          >
-            <div className="flex items-center gap-2.5">
-              {filters.status !== "all" && (
-                <div
-                  className={`w-2 h-2 rounded-full ${
-                    filters.status === "upcoming"
-                      ? "bg-blue-600"
-                      : filters.status === "ongoing"
-                      ? "bg-green-600"
-                      : "bg-gray-600"
-                  }`}
-                />
-              )}
-              <span
-                className={
-                  filters.status === "all" ? "text-gray-500" : "text-gray-900"
-                }
-              >
-                {statusOptions.find((s) => s.value === filters.status)?.label}
-              </span>
-            </div>
-            <ChevronDown className="h-4 w-4 text-gray-400" />
-          </button>
-          {showStatusDropdown && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10">
-              <div className="p-1.5">
-                {statusOptions.map((status) => (
-                  <button
-                    key={status.value}
-                    onClick={() => {
-                      setFilters({ ...filters, status: status.value });
-                      setShowStatusDropdown(false);
-                    }}
-                    className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-md text-sm text-gray-700 flex items-center gap-2.5"
-                  >
-                    {status.value !== "all" && (
-                      <div
-                        className={`w-2 h-2 rounded-full ${
-                          status.value === "upcoming"
-                            ? "bg-blue-600"
-                            : status.value === "ongoing"
-                            ? "bg-green-600"
-                            : "bg-gray-600"
-                        }`}
-                      />
-                    )}
-                    <span>{status.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+            {statusOptions.map((status) => (
+              <SelectItem key={status.value} value={status.value}>
+                {status.label}
+              </SelectItem>
+            ))}
+          </CustomFormField>
+        </form>
+      </Form>
 
       {/* Active Filters & Results */}
-      <div className="mt-6 pt-4 border-t border-gray-200">
+      <div className="mt-6 pt-4 border-t border-c-stroke-gray">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           {/* Quick Actions */}
           <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-c-heading">
               Quick Filters:
             </label>
             <div className="flex gap-3">
@@ -202,9 +120,9 @@ const Filters = () => {
                     status: "all",
                   })
                 }
-                className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 hover:border-blue-300 transition-colors"
+                className="px-3 py-0.5 text-sm  rounded-full cursor-pointer font-medium text-blue-600 bg-blue-50 border border-blue-200  hover:bg-blue-100 hover:border-blue-300 transition-colors"
               >
-                Today's Bookings
+                Today&apos;s Bookings
               </button>
               <button
                 onClick={() =>
@@ -213,7 +131,7 @@ const Filters = () => {
                     status: "ongoing",
                   })
                 }
-                className="px-4 py-2 text-sm font-medium text-green-600 bg-green-50 border border-green-200 rounded-md hover:bg-green-100 hover:border-green-300 transition-colors"
+                className="px-3 py-0.5 text-sm font-medium rounded-full cursor-pointer text-green-600 bg-green-50 border border-green-200  hover:bg-green-100 hover:border-green-300 transition-colors"
               >
                 Active Now
               </button>
