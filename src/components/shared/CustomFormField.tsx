@@ -236,7 +236,7 @@ const RenderIField = ({ field, props }: RenderFieldProps) => {
             <DropdownMenuContent
               align={props.align}
               side={props.side || "bottom"}
-              avoidCollisions={props.avoidCollisions || false}
+              avoidCollisions={props.avoidCollisions || true}
               alignOffset={8}
               sideOffset={8}
               className={cn(

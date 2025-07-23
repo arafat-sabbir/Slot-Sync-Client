@@ -8,11 +8,12 @@ import Filters from "@/components/dashboard/filters";
 import Container from "@/components/layout/Container";
 import BookingCard from "@/components/dashboard/booking-card";
 import { getBookings } from "@/actions/booking/get-bookings";
+import Link from "next/link";
 
 // Custom Hooks
 const useBookings = (filters: FilterOptions) => {
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchBookings = useCallback(async () => {
@@ -30,7 +31,7 @@ const useBookings = (filters: FilterOptions) => {
 
       const response = await getBookings(queryParams);
       const data = response?.data;
-      const sortedBookings = data.sort(
+      const sortedBookings = data?.sort(
         (a: Booking, b: Booking) =>
           new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
       );
@@ -75,14 +76,14 @@ const BookingsGrid: React.FC<{
   onCancel: (id: string) => Promise<{ success: boolean; error?: string }>;
 }> = ({ bookings, onCancel }) => {
   const groupedBookings = useMemo(() => {
-    return bookings.reduce((acc, booking) => {
+    return bookings?.reduce((acc, booking) => {
       acc[booking.resource] = acc[booking.resource] || [];
       acc[booking.resource].push(booking);
       return acc;
     }, {} as Record<string, Booking[]>);
   }, [bookings]);
 
-  if (Object.keys(groupedBookings).length === 0) {
+  if (groupedBookings && Object.keys(groupedBookings).length === 0) {
     return (
       <div className="bg-white rounded-xl custom-shadow-sm border border-gray-100 p-12 text-center">
         <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -98,30 +99,33 @@ const BookingsGrid: React.FC<{
 
   return (
     <div className="space-y-8">
-      {Object.entries(groupedBookings).map(([resource, resourceBookings]) => (
-        <div
-          key={resource}
-          className="bg-white rounded-xl custom-shadow-sm border border-gray-100 p-6"
-        >
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-c-heading">{resource}</h2>
-            <span className="text-sm text-c-body2 bg-gray-100 px-2 py-1 rounded-full">
-              {resourceBookings.length} booking
-              {resourceBookings.length !== 1 ? "s" : ""}
-            </span>
-          </div>
+      {groupedBookings &&
+        Object.entries(groupedBookings).map(([resource, resourceBookings]) => (
+          <div
+            key={resource}
+            className="bg-white rounded-xl custom-shadow-sm border border-gray-100 p-6"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-c-heading">
+                {resource}
+              </h2>
+              <span className="text-sm text-c-body2 bg-gray-100 px-2 py-1 rounded-full">
+                {resourceBookings.length} booking
+                {resourceBookings.length !== 1 ? "s" : ""}
+              </span>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {resourceBookings.map((booking) => (
-              <BookingCard
-                key={booking.id}
-                booking={booking}
-                onCancel={onCancel}
-              />
-            ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {resourceBookings.map((booking) => (
+                <BookingCard
+                  key={booking.id}
+                  booking={booking}
+                  onCancel={onCancel}
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
     </div>
   );
 };
@@ -176,11 +180,11 @@ const BookingDashboard: React.FC = () => {
     let filtered = bookings;
 
     if (filters.resource !== "all") {
-      filtered = filtered.filter((b) => b.resource === filters.resource);
+      filtered = filtered?.filter((b) => b.resource === filters.resource);
     }
 
     if (filters.date) {
-      filtered = filtered.filter((b) => {
+      filtered = filtered?.filter((b) => {
         const bookingDate = new Date(b.startTime);
         return (
           bookingDate >= startOfDay(filters.date!) &&
@@ -190,7 +194,7 @@ const BookingDashboard: React.FC = () => {
     }
 
     if (filters.status !== "all") {
-      filtered = filtered.filter((b) => {
+      filtered = filtered?.filter((b) => {
         const start = new Date(b.startTime);
         const end = new Date(b.endTime);
         return getBookingStatus(start, end) === filters.status;
@@ -223,10 +227,12 @@ const BookingDashboard: React.FC = () => {
               Refresh
             </button>
 
-            <button className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 transition-colors">
-              <Plus className="h-4 w-4" />
-              New Booking
-            </button>
+            <Link href={"/booking/new"}>
+              <button className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-c-action-brand cursor-pointer rounded-lg hover:bg-c-action-brand transition-colors">
+                <Plus className="h-4 w-4" />
+                New Booking
+              </button>
+            </Link>
           </div>
         </div>
 
