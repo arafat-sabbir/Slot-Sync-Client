@@ -15,3 +15,8 @@ export type FilterOptions = {
   date: Date | undefined;
   status: BookingStatus | "all";
 };
+
+export type BookingQueryParams = {
+  resource?: string;
+  date?: string; // ISO string format (e.g. "2025-07-23T00:00:00.000Z")
+};

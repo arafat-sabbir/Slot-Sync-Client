@@ -10,20 +10,17 @@ import {
   getLabelClassNames,
   getSelectTriggerClassName,
 } from "@/styles";
+import { FilterOptions } from "@/app/types";
 
-const Filters = () => {
-  const [filters, setFilters] = useState({
-    resource: "all",
-    date: undefined,
-    status: "all",
-  });
-
-  const resources = [
-    "Conference Room A",
-    "Conference Room B",
-    "Meeting Room 1",
-    "Meeting Room 2",
-  ];
+const Filters = ({
+  filters,
+  setFilters,
+  resources,
+}: {
+  filters: FilterOptions;
+  resources: string[];
+  setFilters: React.Dispatch<React.SetStateAction<FilterOptions>>;
+}) => {
   const totalBookings = 127;
   const filteredCount = 89;
 
@@ -48,8 +45,13 @@ const Filters = () => {
       date: watchedValues.date,
       status: watchedValues.status || "all",
     }));
-  }, [watchedValues.resource, watchedValues.date, watchedValues.status]);
-  
+  }, [
+    watchedValues.resource,
+    watchedValues.date,
+    watchedValues.status,
+    setFilters,
+  ]);
+
   return (
     <div className="p-6  rounded-xl custom-shadow-sm border border-c-stroke-gray">
       {/* Main Filter Grid */}

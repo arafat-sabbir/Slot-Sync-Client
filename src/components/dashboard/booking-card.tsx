@@ -1,3 +1,7 @@
+import { Booking } from "@/app/types";
+import { getBookingStatus, getStatusColor } from "@/lib/utils";
+import { format } from "date-fns";
+import { Calendar } from "lucide-react";
 import { useState } from "react";
 
 const BookingCard: React.FC<{

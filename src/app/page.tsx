@@ -1,25 +1,13 @@
 "use client";
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import {
-  format,
-  isBefore,
-  isWithinInterval,
-  startOfDay,
-  endOfDay,
-} from "date-fns";
-import {
-  Calendar,
-  Plus,
-  Search,
-  Filter,
-  RefreshCw,
-  AlertCircle,
-  Clock,
-} from "lucide-react";
-import { FilterOptions } from "./types";
+import { startOfDay, endOfDay } from "date-fns";
+import { Plus, RefreshCw, AlertCircle, Clock } from "lucide-react";
+import { Booking, BookingQueryParams, FilterOptions } from "./types";
 import { getBookingStatus } from "@/lib/utils";
 import Filters from "@/components/dashboard/filters";
 import Container from "@/components/layout/Container";
+import BookingCard from "@/components/dashboard/booking-card";
+import { getBookings } from "@/actions/booking/get-bookings";
 
 // Custom Hooks
 const useBookings = (filters: FilterOptions) => {
@@ -32,20 +20,16 @@ const useBookings = (filters: FilterOptions) => {
     setError(null);
 
     try {
-      const params = new URLSearchParams();
+      const queryParams: BookingQueryParams = {};
       if (filters.resource !== "all") {
-        params.append("resource", filters.resource);
+        queryParams.resource = filters.resource;
       }
       if (filters.date) {
-        params.append("date", startOfDay(filters.date).toISOString());
+        queryParams.date = startOfDay(filters.date).toISOString();
       }
 
-      const response = await fetch(`/api/bookings?${params.toString()}`);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch bookings: ${response.statusText}`);
-      }
-
-      const data = await response.json();
+      const response = await getBookings(queryParams);
+      const data = response?.data;
       const sortedBookings = data.sort(
         (a: Booking, b: Booking) =>
           new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
@@ -174,16 +158,19 @@ const LoadingState: React.FC = () => (
 const BookingDashboard: React.FC = () => {
   const [filters, setFilters] = useState<FilterOptions>({
     resource: "all",
-    date: new Date(),
-    status: "all",
+    date: undefined,
+    status: "all" as const,
   });
 
   const { bookings, isLoading, error, refetch, cancelBooking } =
     useBookings(filters);
 
-  const resources = useMemo(() => {
-    return Array.from(new Set(bookings.map((b) => b.resource)));
-  }, [bookings]);
+  const resources = [
+    "Conference Room A",
+    "Conference Room B",
+    "Meeting Room 1",
+    "Meeting Room 2",
+  ];
 
   const filteredBookings = useMemo(() => {
     let filtered = bookings;
@@ -247,7 +234,7 @@ const BookingDashboard: React.FC = () => {
         <div className="mb-8">
           <Filters
             filters={filters}
-            onFiltersChange={setFilters}
+            setFilters={setFilters}
             resources={resources}
           />
         </div>

@@ -33,9 +33,7 @@ import { CalendarIcon } from "lucide-react";
 const bookingSchema = z
   .object({
     requestedBy: z.string().min(1, "Name is required"),
-    resource: z.enum(["Room A", "Room B", "Room C", "Device X"], {
-      errorMap: () => ({ message: "Please select a resource" }),
-    }),
+    resource: z.enum(["Room A", "Room B", "Room C", "Device X"]),
     startTime: z.string().refine((val) => !isNaN(Date.parse(val)), {
       message: "Invalid start time",
     }),
@@ -113,19 +111,12 @@ export default function CreateBookingPage() {
       }
 
       const data = await response.json();
-      toast({
-        title: "Success",
-        description: "Booking created successfully!",
-      });
+      toast.success("Booking created successfully!");
       form.reset();
       setStartDate(undefined);
       setEndDate(undefined);
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Something went wrong",
-        variant: "destructive",
-      });
+      toast.error(error.message);
     }
   };
 
