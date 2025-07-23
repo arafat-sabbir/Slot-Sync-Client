@@ -27,118 +27,15 @@ import {
 } from "@/styles";
 import Container from "@/components/layout/Container";
 import Link from "next/link";
-
-// 🕓 DateTimePicker component
-interface DateTimePickerProps {
-  value?: Date;
-  onChange: (date?: Date) => void;
-  placeholder?: string;
-  className?: string;
-}
-
-function DateTimePicker({
-  value,
-  onChange,
-  placeholder = "Select date and time",
-  className,
-}: DateTimePickerProps) {
-  const [date, setDate] = useState<Date | undefined>(value);
-  const [hour, setHour] = useState<string>(value ? format(value, "HH") : "00");
-  const [minute, setMinute] = useState<string>(
-    value ? format(value, "mm") : "00"
-  );
-
-  const handleDateChange = (selectedDate: Date | undefined) => {
-    if (!selectedDate) {
-      setDate(undefined);
-      onChange(undefined);
-      return;
-    }
-
-    let newDate = selectedDate;
-    newDate = setHours(newDate, parseInt(hour));
-    newDate = setMinutes(newDate, parseInt(minute));
-    setDate(newDate);
-    onChange(newDate);
-  };
-
-  const handleHourChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newHour = e.target.value.padStart(2, "0");
-    if (parseInt(newHour) >= 0 && parseInt(newHour) <= 23) {
-      setHour(newHour);
-      if (date) {
-        const newDate = setHours(date, parseInt(newHour));
-        setDate(newDate);
-        onChange(newDate);
-      }
-    }
-  };
-
-  const handleMinuteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newMinute = e.target.value.padStart(2, "0");
-    if (parseInt(newMinute) >= 0 && parseInt(newMinute) <= 59) {
-      setMinute(newMinute);
-      if (date) {
-        const newDate = setMinutes(date, parseInt(newMinute));
-        setDate(newDate);
-        onChange(newDate);
-      }
-    }
-  };
-
-  return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          className={`w-full justify-start text-left font-normal ${className} ${
-            !date ? "text-muted-foreground" : ""
-          }`}
-        >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, "PPP HH:mm") : placeholder}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0">
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={handleDateChange}
-          initialFocus
-        />
-        <div className="p-3 border-t border-border flex gap-2">
-          <Input
-            type="number"
-            min="0"
-            max="23"
-            value={hour}
-            onChange={handleHourChange}
-            placeholder="HH"
-            className="w-16 text-center"
-          />
-          <span className="self-center">:</span>
-          <Input
-            type="number"
-            min="0"
-            max="59"
-            value={minute}
-            onChange={handleMinuteChange}
-            placeholder="MM"
-            className="w-16 text-center"
-          />
-        </div>
-      </PopoverContent>
-    </Popover>
-  );
-}
+import DateTimePickerForm from "@/components/time-picker/date-time-picker-form";
 
 // 🧠 Zod Schema
 const bookingSchema = z
   .object({
     requestedBy: z.string().min(1, "Name is required"),
     resource: z.enum(["Room A", "Room B", "Room C", "Device X"]),
-    startTime: z.date({ required_error: "Start time is required" }),
-    endTime: z.date({ required_error: "End time is required" }),
+    startTime: z.date({ message: "Start time is required" }),
+    endTime: z.date({ message: "End time is required" }),
   })
   .refine((data) => data.endTime > data.startTime, {
     message: "End time must be after start time",
@@ -235,39 +132,21 @@ export default function CreateBookingPage() {
             </CustomFormField>
 
             <CustomFormField
-              fieldType={FormFieldType.CALENDAR}
+              fieldType={FormFieldType.DATE_PICKER}
               name="startTime"
               control={form.control}
               label="Start Time"
               className={getInputClassNames()}
               labelClassname={getLabelClassNames()}
             />
-
             <CustomFormField
-              fieldType={FormFieldType.CALENDAR}
+              fieldType={FormFieldType.DATE_PICKER}
               name="endTime"
               control={form.control}
               label="End Time"
               className={getInputClassNames()}
               labelClassname={getLabelClassNames()}
             />
-
-            {/* 🌟 Custom DateTime Picker Demo Field */}
-            <div>
-              <label className={getLabelClassNames()}>Round Date Time</label>
-              <DateTimePicker
-                value={roundDateTime}
-                onChange={(date) => setRoundDateTime(date)}
-                placeholder="Pick a time for round"
-                className="mt-1"
-              />
-              {roundDateTime && (
-                <p className="text-sm mt-2 text-gray-600">
-                  Selected: {format(roundDateTime, "PPP HH:mm")}
-                </p>
-              )}
-            </div>
-
             <Button
               type="submit"
               className="w-full h-11 bg-c-action-brand mt-6 rounded-lg"

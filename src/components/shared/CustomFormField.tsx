@@ -27,6 +27,7 @@ import { ScrollArea } from "../ui/scroll-area";
 import { format } from "date-fns";
 import { Calendar } from "../ui/calendar";
 import { Button } from "../ui/button";
+import { TimePicker } from "../time-picker/time-picker";
 
 export type FormFieldType =
   | "input"
@@ -52,6 +53,7 @@ export const FormFieldType = {
   TAGS: "tags",
   CHECKBOX: "checkbox",
   PASSWORD: "password",
+  DATE_PICKER: "date_picker",
   RANGE: "range",
   IMAGE: "image",
   FILE: "file",
@@ -254,6 +256,52 @@ const RenderIField = ({ field, props }: RenderFieldProps) => {
                 captionLayout="dropdown"
                 required={mode === "range"}
               />
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </FormControl>
+      );
+    case FormFieldType.DATE_PICKER:
+      return (
+        <FormControl>
+          <DropdownMenu open={calendarOpen} onOpenChange={setCalendarOpen}>
+            <DropdownMenuTrigger asChild>
+              <FormControl>
+                <Button
+                  variant={"outline"}
+                  className={cn("text-c-body2 hover:text-c-body2", className)}
+                >
+                  {field.value ? (
+                    format(field.value, "PPP HH:mm:ss")
+                  ) : (
+                    <span>Pick a date</span>
+                  )}
+                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                </Button>
+              </FormControl>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align={props.align}
+              side={props.side || "bottom"}
+              avoidCollisions={props.avoidCollisions || true}
+              alignOffset={8}
+              sideOffset={8}
+              className={cn(
+                "custom-scrollbar z-50 w-full rounded-xl custom-shadow-sm border border-c-stroke-gray",
+                props.contentClassName
+              )}
+            >
+              <Calendar
+                mode="single"
+                selected={field.value}
+                onSelect={field.onChange}
+                disabled={(date) =>
+                  date > new Date() || date < new Date("1900-01-01")
+                }
+                initialFocus
+              />
+              <div className="p-3 border-t border-border">
+                <TimePicker setDate={field.onChange} date={field.value} />
+              </div>
             </DropdownMenuContent>
           </DropdownMenu>
         </FormControl>
