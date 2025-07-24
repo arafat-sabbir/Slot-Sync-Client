@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Onest } from "next/font/google";
+import Navbar from "@/components/shared/Navbar";
 
 export const metadata: Metadata = {
   title: "Slot Sync - Dashboard",
@@ -18,7 +19,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${onest.className} antialiased`}>{children}</body>
+      <body className={`${onest.className} antialiased`}>
+        <Navbar />
+        {children}
+      </body>
     </html>
   );
 }

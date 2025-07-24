@@ -28,6 +28,7 @@ import {
 import Container from "@/components/layout/Container";
 import Link from "next/link";
 import DateTimePickerForm from "@/components/time-picker/date-time-picker-form";
+import DashboardHeader from "@/components/dashboard/DashboardNavbar";
 
 // 🧠 Zod Schema
 const bookingSchema = z
@@ -68,6 +69,7 @@ export default function CreateBookingPage() {
   });
 
   const onSubmit = async (values: BookingFormValues) => {
+    console.log({ values });
     try {
       const response = await fetch("/api/bookings", {
         method: "POST",
@@ -94,12 +96,6 @@ export default function CreateBookingPage() {
 
   return (
     <Container className="h-screen relative flex items-center justify-center">
-      <Link
-        href={"/"}
-        className="absolute sm:top-30 sm:left-20 flex gap-1 font-medium tracking-wide text-c-body3 items-center top-4 left-4"
-      >
-        <Home className="text-c-icon-disabled cursor-pointer" /> Home
-      </Link>
       <div className="bg-white custom-shadow-md w-[600px] rounded-lg sm:p-12 p-6">
         <h1 className="mb-4 text-2xl font-semibold text-c-heading sm:leading-[30px]">
           Book New Slot

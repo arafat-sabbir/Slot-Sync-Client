@@ -45,7 +45,7 @@ const BookingDashboard: React.FC = () => {
     try {
       const response = await cancelBookingAction(bookingId);
       if (!response.error) {
-        setRefetch(prev => !prev); // Trigger refetch after successful cancellation
+        setRefetch((prev) => !prev); // Trigger refetch after successful cancellation
       }
     } catch (err) {
       console.error("Failed to cancel booking", err);
@@ -57,7 +57,7 @@ const BookingDashboard: React.FC = () => {
   };
 
   const onRefetch = () => {
-    setRefetch(prev => !prev);
+    setRefetch((prev) => !prev);
   };
 
   const resources = [
@@ -69,7 +69,7 @@ const BookingDashboard: React.FC = () => {
   ];
 
   return (
-    <Container className="min-h-screen bg-gray-50">
+    <Container className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header Section */}
         <DashboardHeader onRefresh={onRefetch} />
