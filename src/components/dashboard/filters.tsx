@@ -18,7 +18,7 @@ const Filters = ({
   setFilters,
 }: {
   filters: FilterOptions;
-  setFilters: React.Dispatch<React.SetStateAction<FilterOptions>>;
+  setFilters: any;
 }) => {
   const hasActiveFilters =
     filters.resource !== "all" ||
@@ -41,14 +41,14 @@ const Filters = ({
   });
 
   const handleValueChange = (field: keyof FilterOptions, value: any) => {
-    setFilters((prev) => ({
+    setFilters((prev: any) => ({
       ...prev,
       [field]: value,
     }));
   };
 
   const clearFilter = (field: keyof FilterOptions) => {
-    setFilters((prev) => ({
+    setFilters((prev: any) => ({
       ...prev,
       [field]:
         field === "resource" ? "all" : field === "status" ? "all" : undefined,
@@ -150,7 +150,7 @@ const Filters = ({
               <button
                 type="button"
                 onClick={() => {
-                  setFilters((prev) => ({
+                  setFilters((prev: any) => ({
                     ...prev,
                     status: "ongoing",
                   }));

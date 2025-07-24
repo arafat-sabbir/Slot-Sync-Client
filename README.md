@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Slot-Sync Frontend
+The Slot-Sync frontend is a modern booking dashboard built with Next.js, React, and Tailwind CSS. It allows users to view, filter, and cancel resource bookings, and navigate to a form for creating new bookings. Check out the repository at arafat-sabbir/Slot-Sync-Client or visit the live app at https://slot-sync-client.vercel.app/.
+Table of Contents
 
-## Getting Started
+Features
+Setup
+Running the Frontend
+Technologies
+Contributing
 
-First, run the development server:
+Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Booking Dashboard: Displays bookings grouped by resource in a responsive grid, with a fallback message ("No bookings found") when no bookings match filters.
+Filters: Filter bookings by resource, date, or status (Upcoming, Ongoing, Past).
+Cancel Bookings: Cancel bookings directly from the dashboard with optimistic updates.
+New Booking: Link to a form for creating new bookings.
+Responsive UI: Styled with Tailwind CSS and lucide-react icons for a clean, modern look.
+Font Optimization: Uses next/font with Geist for optimized font loading.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Clone the Repository:
+git clone https://github.com/arafat-sabbir/Slot-Sync-Client.git
+cd Slot-Sync-Client
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+Install Dependencies:
+npm install
 
-To learn more about Next.js, take a look at the following resources:
+Required packages: next, react, react-dom, date-fns, lucide-react.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Set Up Environment:Create a .env.local file in the root directory:
+NEXT_PUBLIC_API_URL=http://localhost:5000/api
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Running the Frontend
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Ensure the backend is running at http://localhost:5000/api (see Slot-Sync-Server).
+Start the Next.js app:npm run dev
+
+
+Open http://localhost:3000 in your browser to view the dashboard.
+
+Technologies
+
+Next.js: React framework
+React: UI components
+Tailwind CSS: Styling
+lucide-react: Icons
+date-fns: Date handling
+TypeScript: Type safety
+
+Contributing
+
+Fork the repository.
+Create a feature branch (git checkout -b feature/YourFeature).
+Commit changes (git commit -m "Add YourFeature").
+Push to the branch (git push origin feature/YourFeature).
+Open a pull request on GitHub.
+
+For bugs or feature requests, please open an issue.
+Deploy on Vercel
+The easiest way to deploy this Next.js app is via the Vercel Platform. Ensure the NEXT_PUBLIC_API_URL is set to https://slot-sync-server.vercel.app/api in your Vercel environment variables.

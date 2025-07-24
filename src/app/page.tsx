@@ -26,7 +26,7 @@ const BookingDashboard: React.FC = () => {
       setIsLoading(true);
       setError("");
       try {
-        const bookings = await getBookings(filters);
+        const bookings = await getBookings(filters as any);
         if (bookings.error) {
           setError(bookings.error);
         } else {

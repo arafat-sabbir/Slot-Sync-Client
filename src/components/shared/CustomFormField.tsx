@@ -110,12 +110,12 @@ interface FieldProps {
   name: string;
 }
 
-interface RenderFieldProps {
+interface RenderFieldProps<T extends FieldValues = FieldValues> {
   field: FieldProps;
-  props: CustomFormFieldProps;
+  props: CustomFormFieldProps<T>;
 }
 
-const RenderIField = ({ field, props }: RenderFieldProps) => {
+const RenderIField = <T extends FieldValues>({ field, props }: RenderFieldProps<T>) => {
   const [showPassword, setShowPassword] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
 
@@ -376,7 +376,7 @@ const CustomFormField = <T extends FieldValues>(
           {label && fieldType !== FormFieldType.CHECKBOX && (
             <FormLabel className={cn("", labelClassname)}>{label}</FormLabel>
           )}
-          <RenderIField field={field} props={{ ...props, value: value ?? field.value }} />
+          <RenderIField<T> field={field} props={{ ...props, value: value ?? field.value }} />
           <FormMessage className="shad-error" />
         </FormItem>
       )}

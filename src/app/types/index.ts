@@ -1,4 +1,5 @@
-import { bookingSchema } from "../booking/new/page";
+import { bookingSchema } from "@/validation";
+import z from "zod";
 
 export type Booking = {
   id: string;
@@ -27,7 +28,7 @@ export type BookingQueryParams = {
 
 export interface BookingsGridProps {
   bookings: Booking[];
-  onCancel: (id: string) => Promise<{ success: boolean; error?: string }>;
+  onCancel: any;
 }
 
 export interface ErrorStateProps {
@@ -44,7 +45,6 @@ export interface UseBookingsReturn {
   isLoading: boolean;
   error: string | null;
   refetch: () => Promise<void>;
+}
 
-
-
-export type BookingFormValues = z.infer<typeof bookingSchema>
+export type BookingFormValues = z.infer<typeof bookingSchema>;
