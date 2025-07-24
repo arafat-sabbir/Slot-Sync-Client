@@ -23,3 +23,12 @@ export const menu = [
     path: "/booking/new",
   },
 ];
+
+
+  export const resources = [
+    "Meeting Room",
+    "Conference Room",
+    "Training Room",
+    "Collaboration Space",
+    "Event Space",
+  ];

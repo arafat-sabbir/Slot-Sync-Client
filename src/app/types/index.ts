@@ -1,3 +1,5 @@
+import { bookingSchema } from "../booking/new/page";
+
 export type Booking = {
   id: string;
   resource: string;
@@ -42,4 +44,7 @@ export interface UseBookingsReturn {
   isLoading: boolean;
   error: string | null;
   refetch: () => Promise<void>;
-}
+
+
+
+export type BookingFormValues = z.infer<typeof bookingSchema>

@@ -11,14 +11,13 @@ import {
   getSelectTriggerClassName,
 } from "@/styles";
 import { FilterOptions } from "@/app/types";
+import { resources } from "@/data";
 
 const Filters = ({
   filters,
   setFilters,
-  resources,
 }: {
   filters: FilterOptions;
-  resources: string[];
   setFilters: React.Dispatch<React.SetStateAction<FilterOptions>>;
 }) => {
   const hasActiveFilters =

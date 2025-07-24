@@ -4,19 +4,12 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { format, differenceInMinutes, setHours, setMinutes } from "date-fns";
+
+import { differenceInMinutes } from "date-fns";
 import { useState } from "react";
-import { CalendarIcon, Home } from "lucide-react";
 import CustomFormField, {
   FormFieldType,
 } from "@/components/shared/CustomFormField";
@@ -25,16 +18,19 @@ import {
   getLabelClassNames,
   getSelectTriggerClassName,
 } from "@/styles";
-import Container from "@/components/layout/Container";
 import Link from "next/link";
-import DateTimePickerForm from "@/components/time-picker/date-time-picker-form";
-import DashboardHeader from "@/components/dashboard/DashboardNavbar";
+import { BookingFormValues } from "@/app/types";
+import { bookSlot } from "@/actions/booking/book-slot";
+import Container from "@/components/layout/Container";
+import { resources } from "@/data";
+import { Loader } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 // 🧠 Zod Schema
-const bookingSchema = z
+export const bookingSchema = z
   .object({
     requestedBy: z.string().min(1, "Name is required"),
-    resource: z.enum(["Room A", "Room B", "Room C", "Device X"]),
+    resource: z.enum(resources, { message: "Resource is required" }),
     startTime: z.date({ message: "Start time is required" }),
     endTime: z.date({ message: "End time is required" }),
   })
@@ -51,12 +47,9 @@ const bookingSchema = z
     path: ["endTime"],
   });
 
-type BookingFormValues = z.infer<typeof bookingSchema>;
-
 export default function CreateBookingPage() {
-  const [roundDateTime, setRoundDateTime] = useState<Date | undefined>(
-    undefined
-  );
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingSchema),
@@ -69,33 +62,25 @@ export default function CreateBookingPage() {
   });
 
   const onSubmit = async (values: BookingFormValues) => {
-    console.log({ values });
     try {
-      const response = await fetch("/api/bookings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...values,
-          startTime: values.startTime.toISOString(),
-          endTime: values.endTime.toISOString(),
-        }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to create booking");
+      setLoading(true);
+      const response = await bookSlot(values);
+      if (response.error) {
+        console.log(response?.error);
       }
-
-      toast.success("Booking created successfully!");
+      console.log({ response });
+      toast.success(response?.message);
+      router.push("/");
       form.reset();
-      setRoundDateTime(undefined);
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <Container className="h-screen relative flex items-center justify-center">
+    <Container className="h-[calc(100vh-92px)] relative flex items-center justify-center">
       <div className="bg-white custom-shadow-md w-[600px] rounded-lg sm:p-12 p-6">
         <h1 className="mb-4 text-2xl font-semibold text-c-heading sm:leading-[30px]">
           Book New Slot
@@ -121,10 +106,11 @@ export default function CreateBookingPage() {
               labelClassname={getLabelClassNames()}
               placeholder="Select a resource"
             >
-              <SelectItem value="Room A">Room A</SelectItem>
-              <SelectItem value="Room B">Room B</SelectItem>
-              <SelectItem value="Room C">Room C</SelectItem>
-              <SelectItem value="Device X">Device X</SelectItem>
+              {resources.map((item) => (
+                <SelectItem key={item} value={item}>
+                  {item}
+                </SelectItem>
+              ))}
             </CustomFormField>
 
             <CustomFormField
@@ -145,9 +131,10 @@ export default function CreateBookingPage() {
             />
             <Button
               type="submit"
+              disabled={loading}
               className="w-full h-11 bg-c-action-brand mt-6 rounded-lg"
             >
-              Submit Booking
+              Submit Booking {loading && <Loader className="animate-spin" />}
             </Button>
           </form>
         </Form>

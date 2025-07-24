@@ -60,14 +60,6 @@ const BookingDashboard: React.FC = () => {
     setRefetch((prev) => !prev);
   };
 
-  const resources = [
-    "Meeting Room",
-    "Conference Room",
-    "Training Room",
-    "Collaboration Space",
-    "Event Space",
-  ];
-
   return (
     <Container className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -79,7 +71,6 @@ const BookingDashboard: React.FC = () => {
           <Filters
             filters={filters}
             setFilters={handleFiltersChange}
-            resources={resources}
           />
         </div>
 
