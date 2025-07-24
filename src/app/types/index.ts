@@ -20,3 +20,26 @@ export type BookingQueryParams = {
   resource?: string;
   date?: string; // ISO string format (e.g. "2025-07-23T00:00:00.000Z")
 };
+
+// Types
+
+export interface BookingsGridProps {
+  bookings: Booking[];
+  onCancel: (id: string) => Promise<{ success: boolean; error?: string }>;
+}
+
+export interface ErrorStateProps {
+  error: string;
+  onRetry: () => void;
+}
+
+// ==========================================
+// TYPES AND INTERFACES
+// ==========================================
+
+export interface UseBookingsReturn {
+  bookings: Booking[];
+  isLoading: boolean;
+  error: string | null;
+  refetch: () => Promise<void>;
+}

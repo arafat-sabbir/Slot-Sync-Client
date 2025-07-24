@@ -84,6 +84,7 @@ export interface CustomFormFieldProps<T extends FieldValues = FieldValues> {
   dateFormat?: string;
   children?: ReactNode;
   onChange?: (value: any) => void;
+  onValueChange?: (value: any) => void; // New prop
   inputClassName?: string;
   countrySelectClassName?: string;
   showDialCode?: boolean;
@@ -99,6 +100,7 @@ export interface CustomFormFieldProps<T extends FieldValues = FieldValues> {
   onSelect?: (date: Date) => void;
   onDateRangeChange?: (start: Date | null, end: Date | null) => void;
   indicator?: boolean;
+  value?: any; // New prop for controlled components
 }
 
 interface FieldProps {
@@ -123,10 +125,18 @@ const RenderIField = ({ field, props }: RenderFieldProps) => {
     className,
     type,
     onChange,
+    onValueChange,
     selectTriggerClassName,
     disabled,
     mode,
+    value,
   } = props;
+
+  const handleChange = (value: any) => {
+    field.onChange(value);
+    if (onChange) onChange(value);
+    if (onValueChange) onValueChange(value);
+  };
 
   switch (fieldType) {
     case FormFieldType.INPUT:
@@ -135,8 +145,8 @@ const RenderIField = ({ field, props }: RenderFieldProps) => {
           <Input
             placeholder={placeholder}
             disabled={disabled}
-            value={field.value || ""}
-            onChange={(e) => field.onChange(e.target.value)}
+            value={value ?? field.value ?? ""}
+            onChange={(e) => handleChange(e.target.value)}
             onBlur={field.onBlur}
             name={field.name}
             type={type}
@@ -154,8 +164,8 @@ const RenderIField = ({ field, props }: RenderFieldProps) => {
           <Textarea
             placeholder={placeholder}
             disabled={disabled}
-            value={field.value || ""}
-            onChange={(e) => field.onChange(e.target.value)}
+            value={value ?? field.value ?? ""}
+            onChange={(e) => handleChange(e.target.value)}
             onBlur={field.onBlur}
             name={field.name}
             className={cn(
@@ -173,7 +183,9 @@ const RenderIField = ({ field, props }: RenderFieldProps) => {
             <Input
               placeholder={placeholder}
               disabled={disabled}
-              {...field}
+              value={value ?? field.value ?? ""}
+              onChange={(e) => handleChange(e.target.value)}
+              onBlur={field.onBlur}
               type={showPassword ? "text" : "password"}
               className={cn(
                 "flex-1 border-0 focus:outline-none focus:ring-0 focus-visible:ring-0",
@@ -199,11 +211,8 @@ const RenderIField = ({ field, props }: RenderFieldProps) => {
       return (
         <FormControl>
           <Select
-            onValueChange={(value) => {
-              field.onChange(value);
-              if (onChange) onChange(value);
-            }}
-            value={field.value}
+            onValueChange={handleChange}
+            value={value ?? field.value}
             disabled={disabled}
           >
             <SelectTrigger className={cn(selectTriggerClassName)}>
@@ -226,8 +235,8 @@ const RenderIField = ({ field, props }: RenderFieldProps) => {
                   variant={"outline"}
                   className={cn("text-c-body2 hover:text-c-body2", className)}
                 >
-                  {field.value ? (
-                    format(field.value, "PPP")
+                  {value ?? field.value ? (
+                    format(value ?? field.value, "PPP")
                   ) : (
                     <span>Pick a date</span>
                   )}
@@ -248,8 +257,8 @@ const RenderIField = ({ field, props }: RenderFieldProps) => {
             >
               <Calendar
                 mode={mode || "single"}
-                selected={field.value}
-                onSelect={field.onChange}
+                selected={value ?? field.value}
+                onSelect={handleChange}
                 disabled={(date) =>
                   date > new Date() || date < new Date("1900-01-01")
                 }
@@ -260,6 +269,7 @@ const RenderIField = ({ field, props }: RenderFieldProps) => {
           </DropdownMenu>
         </FormControl>
       );
+
     case FormFieldType.DATE_PICKER:
       return (
         <FormControl>
@@ -270,8 +280,8 @@ const RenderIField = ({ field, props }: RenderFieldProps) => {
                   variant={"outline"}
                   className={cn("text-c-body2 hover:text-c-body2", className)}
                 >
-                  {field.value ? (
-                    format(field.value, "PPP HH:mm:ss")
+                  {value ?? field.value ? (
+                    format(value ?? field.value, "PPP HH:mm:ss")
                   ) : (
                     <span>Pick a date</span>
                   )}
@@ -292,27 +302,31 @@ const RenderIField = ({ field, props }: RenderFieldProps) => {
             >
               <Calendar
                 mode="single"
-                selected={field.value}
-                onSelect={field.onChange}
+                selected={value ?? field.value}
+                onSelect={handleChange}
                 disabled={(date) =>
                   date > new Date() || date < new Date("1900-01-01")
                 }
                 initialFocus
               />
               <div className="p-3 border-t border-border">
-                <TimePicker setDate={field.onChange} date={field.value} />
+                <TimePicker 
+                  setDate={handleChange} 
+                  date={value ?? field.value} 
+                />
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
         </FormControl>
       );
+
     case FormFieldType.CHECKBOX:
       return (
         <FormControl>
           <div className="flex items-center space-x-2">
             <Checkbox
-              checked={field.value}
-              onCheckedChange={(checked) => field.onChange(checked)}
+              checked={value ?? field.value}
+              onCheckedChange={(checked) => handleChange(checked)}
               disabled={disabled}
               className="peer data-[state=checked]:border-c-action-brand data-[state=checked]:bg-c-action-brand"
             />
@@ -333,8 +347,7 @@ const RenderIField = ({ field, props }: RenderFieldProps) => {
             type="file"
             onChange={(e) => {
               const file = e.target.files?.[0];
-              field.onChange(file);
-              if (onChange) onChange(file);
+              handleChange(file);
             }}
             onBlur={field.onBlur}
             name={field.name}
@@ -352,7 +365,7 @@ const RenderIField = ({ field, props }: RenderFieldProps) => {
 const CustomFormField = <T extends FieldValues>(
   props: CustomFormFieldProps<T>
 ) => {
-  const { control, label, name, labelClassname, fieldType } = props;
+  const { control, label, name, labelClassname, fieldType, value } = props;
 
   return (
     <FormField
@@ -363,7 +376,7 @@ const CustomFormField = <T extends FieldValues>(
           {label && fieldType !== FormFieldType.CHECKBOX && (
             <FormLabel className={cn("", labelClassname)}>{label}</FormLabel>
           )}
-          <RenderIField field={field} props={props as any} />
+          <RenderIField field={field} props={{ ...props, value: value ?? field.value }} />
           <FormMessage className="shad-error" />
         </FormItem>
       )}

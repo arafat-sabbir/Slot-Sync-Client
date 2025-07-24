@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Calendar, X, MapPin } from "lucide-react";
 import { format } from "date-fns";
 import { useForm } from "react-hook-form";
@@ -21,9 +21,6 @@ const Filters = ({
   resources: string[];
   setFilters: React.Dispatch<React.SetStateAction<FilterOptions>>;
 }) => {
-  const totalBookings = 127;
-  const filteredCount = 89;
-
   const hasActiveFilters =
     filters.resource !== "all" ||
     filters.date !== undefined ||
@@ -36,24 +33,35 @@ const Filters = ({
     { value: "past", label: "Past", color: "gray" },
   ];
 
-  const form = useForm();
-  const watchedValues = form.watch(); // This watches all form values
-  React.useEffect(() => {
+  const form = useForm({
+    defaultValues: {
+      resource: filters.resource,
+      date: filters.date,
+      status: filters.status,
+    },
+  });
+
+  const handleValueChange = (field: keyof FilterOptions, value: any) => {
     setFilters((prev) => ({
       ...prev,
-      resource: watchedValues.resource || "all",
-      date: watchedValues.date,
-      status: watchedValues.status || "all",
+      [field]: value,
     }));
-  }, [
-    watchedValues.resource,
-    watchedValues.date,
-    watchedValues.status,
-    setFilters,
-  ]);
+  };
+
+  const clearFilter = (field: keyof FilterOptions) => {
+    setFilters((prev) => ({
+      ...prev,
+      [field]:
+        field === "resource" ? "all" : field === "status" ? "all" : undefined,
+    }));
+    form.setValue(
+      field,
+      field === "resource" ? "all" : field === "status" ? "all" : undefined
+    );
+  };
 
   return (
-    <div className="p-6  rounded-xl custom-shadow-sm border border-c-stroke-gray">
+    <div className="p-6 rounded-xl custom-shadow-sm border border-c-stroke-gray">
       {/* Main Filter Grid */}
       <Form {...form}>
         <form className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -67,6 +75,8 @@ const Filters = ({
             fieldType={FormFieldType.SELECT}
             label="Resource"
             placeholder="Select Resource"
+            onValueChange={(value) => handleValueChange("resource", value)}
+            value={filters.resource}
           >
             <SelectItem value="all">All Resources</SelectItem>
             {resources.map((r) => (
@@ -75,6 +85,7 @@ const Filters = ({
               </SelectItem>
             ))}
           </CustomFormField>
+
           {/* Date Filter */}
           <CustomFormField
             control={form.control}
@@ -84,7 +95,10 @@ const Filters = ({
             fieldType={FormFieldType.CALENDAR}
             label="Date"
             placeholder="Select Date"
+            onValueChange={(value) => handleValueChange("date", value)}
+            value={filters.date}
           />
+
           {/* Status Filter */}
           <CustomFormField
             control={form.control}
@@ -95,6 +109,8 @@ const Filters = ({
             fieldType={FormFieldType.SELECT}
             placeholder="Select Status"
             label="Status"
+            onValueChange={(value) => handleValueChange("status", value)}
+            value={filters.status}
           >
             {statusOptions.map((status) => (
               <SelectItem key={status.value} value={status.value}>
@@ -115,25 +131,33 @@ const Filters = ({
             </label>
             <div className="flex gap-3">
               <button
-                onClick={() =>
+                type="button"
+                onClick={() => {
                   setFilters({
-                    ...filters,
+                    resource: "all",
                     date: new Date(),
                     status: "all",
-                  })
-                }
-                className="px-3 py-0.5 text-sm  rounded-full cursor-pointer font-medium text-blue-600 bg-blue-50 border border-blue-200  hover:bg-blue-100 hover:border-blue-300 transition-colors"
+                  });
+                  form.reset({
+                    resource: "all",
+                    date: new Date(),
+                    status: "all",
+                  });
+                }}
+                className="px-3 py-0.5 text-sm rounded-full cursor-pointer font-medium text-blue-600 bg-blue-50 border border-blue-200 hover:bg-blue-100 hover:border-blue-300 transition-colors"
               >
-                Today&apos;s Bookings
+                Today's Bookings
               </button>
               <button
-                onClick={() =>
-                  setFilters({
-                    ...filters,
+                type="button"
+                onClick={() => {
+                  setFilters((prev) => ({
+                    ...prev,
                     status: "ongoing",
-                  })
-                }
-                className="px-3 py-0.5 text-sm font-medium rounded-full cursor-pointer text-green-600 bg-green-50 border border-green-200  hover:bg-green-100 hover:border-green-300 transition-colors"
+                  }));
+                  form.setValue("status", "ongoing");
+                }}
+                className="px-3 py-0.5 text-sm font-medium rounded-full cursor-pointer text-green-600 bg-green-50 border border-green-200 hover:bg-green-100 hover:border-green-300 transition-colors"
               >
                 Active Now
               </button>
@@ -148,7 +172,8 @@ const Filters = ({
                   <MapPin className="h-3.5 w-3.5" />
                   {filters.resource}
                   <button
-                    onClick={() => setFilters({ ...filters, resource: "all" })}
+                    type="button"
+                    onClick={() => clearFilter("resource")}
                     className="hover:bg-blue-100 rounded-full p-0.5"
                   >
                     <X className="h-3 w-3" />
@@ -160,7 +185,8 @@ const Filters = ({
                   <Calendar className="h-3.5 w-3.5" />
                   {format(filters.date, "MMM dd")}
                   <button
-                    onClick={() => setFilters({ ...filters, date: undefined })}
+                    type="button"
+                    onClick={() => clearFilter("date")}
                     className="hover:bg-purple-100 rounded-full p-0.5"
                   >
                     <X className="h-3 w-3" />
@@ -180,7 +206,8 @@ const Filters = ({
                   />
                   {filters.status}
                   <button
-                    onClick={() => setFilters({ ...filters, status: "all" })}
+                    type="button"
+                    onClick={() => clearFilter("status")}
                     className="hover:bg-orange-100 rounded-full p-0.5"
                   >
                     <X className="h-3 w-3" />
@@ -189,9 +216,6 @@ const Filters = ({
               )}
             </div>
           )}
-        </div>
-        <div className="mt-4 text-sm text-gray-600">
-          Showing {filteredCount} of {totalBookings} bookings
         </div>
       </div>
     </div>
